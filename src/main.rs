@@ -22,6 +22,7 @@ fn main() -> Result<(), anyhow::Error> {
 
     let json_string = fs::read_to_string(opt.file_name)?;
     let quirks_parsed = serde_json::from_str::<HashMap<String, Quirk>>(&json_string)?;
+    let mut failed_to_parse = 0;
 
     for (site, quirk) in quirks_parsed {
         match parse_password_rules(&quirk.password_rules, true) {
@@ -29,12 +30,14 @@ fn main() -> Result<(), anyhow::Error> {
             Err(e) => {
                 println!("{}:\n", site);
                 println!("{}\n", e.to_string_pretty(&quirk.password_rules)?);
-                return Ok(());
+                failed_to_parse += 1;
             }
         }
     }
 
-    println!("All password rules parsed successfully!");
+    if failed_to_parse == 0 {
+        println!("All password rules parsed successfully!");
+    }
 
     Ok(())
 }
