@@ -7,3 +7,9 @@ Rules that fail to parse will be flagged.
 ```
 cargo run path/to/password-rules.json
 ```
+
+This tool can also diff two quirk files of equivalent length, checking to make sure each rule for each site is semantically equivalent to each other:
+
+```
+cargo run path/to/password-rules.json --diff-against path/to/other-password-rules.json
+```
