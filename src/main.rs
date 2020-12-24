@@ -140,12 +140,36 @@ fn main() -> Result<(), anyhow::Error> {
             );
             assert_eq!(quirk_parsed.allowed, other_quirk_parsed.allowed);
 
-            for required_class in quirk_parsed.required.iter() {
-                assert!(other_quirk_parsed.required.contains(required_class));
+            {
+                // Clone the required classes so removing them doesn't affect the subsequent
+                // loop
+                let mut other_quirk_required = other_quirk_parsed.required.clone();
+                for required_class in quirk_parsed.required.iter() {
+                    assert!(other_quirk_required.contains(required_class));
+                    // Remove the class so it can't be matched again
+                    other_quirk_required.remove(
+                        other_quirk_required
+                            .iter()
+                            .enumerate()
+                            .find(|(_, c)| *c == required_class)
+                            .map(|(i, _)| i)
+                            .unwrap(),
+                    );
+                }
             }
 
             for required_class in other_quirk_parsed.required.iter() {
                 assert!(quirk_parsed.required.contains(required_class));
+                // Remove the class so it can't be matched again
+                quirk_parsed.required.remove(
+                    quirk_parsed
+                        .required
+                        .iter()
+                        .enumerate()
+                        .find(|(_, c)| *c == required_class)
+                        .map(|(i, _)| i)
+                        .unwrap(),
+                );
             }
         }
 
